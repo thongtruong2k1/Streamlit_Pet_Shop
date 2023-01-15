@@ -1,7 +1,10 @@
-# Link data: (link)[https://drive.google.com/drive/folders/131x8fexwDqoyWqMq4iIEvpWm8FE-EETR]
+# Link data: [https://drive.google.com/drive/folders/131x8fexwDqoyWqMq4iIEvpWm8FE-EETR](link)
 - database để sử dụng cho tìm kiếm: `link/CrawlData_Dogs_Cats` (`images_cat` & `images_dog`)
-- database để show trên trang chủ và danh mục sản phẩm: (link)[https://drive.google.com/drive/folders/17SC60cB63BI9_1cw5SwGo3YBYqujCWM0]
-
+- database để show trên trang chủ và danh mục sản phẩm: [https://drive.google.com/drive/folders/17SC60cB63BI9_1cw5SwGo3YBYqujCWM0](link)
+------------------------------------------------------------------
+Vị trí file/folder:
+[![Screenshot-2023-01-15-200009.png](https://i.postimg.cc/NFXLPHNW/Screenshot-2023-01-15-200009.png)](https://postimg.cc/K3ZZ1RhN)
+---------------------------------------------------------------
 # db0.db
 
 ## Table: ShopData
