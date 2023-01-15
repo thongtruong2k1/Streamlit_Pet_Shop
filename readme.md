@@ -3,6 +3,7 @@
 - database để show trên trang chủ và danh mục sản phẩm: [link](https://drive.google.com/drive/folders/17SC60cB63BI9_1cw5SwGo3YBYqujCWM0)
 ------------------------------------------------------------------
 Vị trí file/folder:
+
 [![Screenshot-2023-01-15-200009.png](https://i.postimg.cc/NFXLPHNW/Screenshot-2023-01-15-200009.png)](https://postimg.cc/K3ZZ1RhN)
 ---------------------------------------------------------------
 # db0.db
