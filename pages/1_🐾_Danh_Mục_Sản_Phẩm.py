@@ -40,14 +40,26 @@ def img_to_bytes(img_path):
   encoded_img = base64.b64encode(img_bytes).decode()
   return encoded_img
 
+def get_new_image(image_path):
+  count = 0
+  for i in range(len(image_path)):
+    if image_path[i] == '/':
+      count +=1
+    if count == 3:
+      return i
+
 def write_animals(info, image):
-  image_byte = img_to_bytes(image)
+  index = get_new_image(image) + 1
+  id_image = image[index:-37]
+  loai = 'cat' if info[0]=='Mèo' else 'dog'
+  new_image = f'database/images_{loai}/{id_image}.jpg'
+  image_byte = img_to_bytes(new_image)
   return st.markdown(f"""
           <div class="text-center">
-            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}' target="_parent">
+            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}&id={id_image}' target="_parent">
                 <img src='data:image/jpeg;charset=utf-8;base64,{image_byte}' style='height: 60%; width: 60%; object-fit: contain; border:1px solid black'>
               </a>
-            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}' target="_parent">
+            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}&id={id_image}' target="_parent">
                 <h3 style='text-align: center; color: black; font-size: 30px;'>{info[1]}</h3>
             </a>
           </div>

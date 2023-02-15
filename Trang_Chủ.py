@@ -112,16 +112,24 @@ def img_to_bytes(img_path):
   img_bytes = Path(img_path).read_bytes()
   encoded_img = base64.b64encode(img_bytes).decode()
   return encoded_img
-
+def get_new_image(image_path):
+  count = 0
+  for i in range(len(image_path)):
+    if image_path[i] == '/':
+      count +=1
+    if count == 3:
+      return i
 # @st.cache(suppress_st_warning=True)
 def write_animals(info, image):
+  index = get_new_image(image) + 1
+  id_image = image[index:-37]
   image_byte = img_to_bytes(image)
   return st.markdown(f"""
           <div class="text-center">
-            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[3]}&loai={info[2]}' target="_parent">
+            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[3]}&loai={info[2]}&id={id_image}' target="_parent">
                 <img src='data:image/jpeg;charset=utf-8;base64,{image_byte}' style='height: 60%; width: 60%; object-fit: contain; border:1px solid black'>
-            </a>
-            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[3]}&loai={info[2]}' target="_parent">
+              </a>
+            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[3]}&loai={info[2]}&id={id_image}' target="_parent">
                 <h3 style='text-align: center; color: black; font-size: 30px;'>{info[3]}</h3>
             </a>
           </div>

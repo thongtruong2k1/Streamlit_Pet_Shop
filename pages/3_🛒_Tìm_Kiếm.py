@@ -83,12 +83,13 @@ def img_to_bytes(img_path):
 
 def write_animals(info, image):
   image_byte = img_to_bytes(image)
+  id_image = image[20:-4]
   return st.markdown(f"""
           <div class="text-center">
-            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}' target="_parent">
-                <img src='data:image/jpeg;charset=utf-8;base64,{image_byte}' style='height: 60%; width: 60%; object-fit: contain; border:1px solid black'>
+            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}&id={id_image}' target="_parent">
+                <img src='data:image/jpeg;charset=utf-8;base64,{image_byte}' style='height: 250px; width: 250px; object-fit: contain; border:1px solid black'>
               </a>
-            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}' target="_parent">
+            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}&id={id_image}' target="_parent">
                 <h3 style='text-align: center; color: black; font-size: 30px;'>{info[1]}</h3>
             </a>
           </div>
@@ -172,7 +173,10 @@ if uploaded_file is not None:
         if list_image[0][0][7:10] == 'dog':
           write_animals(["Chó",list_breed[i][0]], name_path)
         else:
-          write_animals(["Mèo",list_breed[i][0]], name_path)  
+          write_animals(["Mèo",list_breed[i][0]], name_path)
+
+
+
 
 
 st.markdown("""

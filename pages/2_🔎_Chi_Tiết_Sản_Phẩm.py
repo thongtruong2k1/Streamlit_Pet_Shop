@@ -39,21 +39,29 @@ placeholder = st.empty()
 with placeholder.container():
   def detail(info):
     return st.markdown(f"""
+            <div class="container">
               <div class="text-center">
-              <h3 style='text-align: center; font-size: 60px;'>{info[3]}</h3>
-                  <p style='text-align: center; font-size: 20px;'>
-                      <br><b>Loại</b>: {info[2]} <br>
-                      <b>Giới tính</b>: {info[5]} <br>
-                      <b>Vacxin</b>: {info[7]} <br>
-                      <b>Tuổi</b>: {info[6]} </br>
-                  </p>
-              </div>
+                <h3 style='text-align: center; font-size: 60px;'>{info[3]}</h3>
+                <p style='text-align: center; font-size: 20px;'>
+                  <br><b>Loại</b>: {info[2]} <br>
+                  <b>Giới tính</b>: {info[5]} <br>
+                  <b>Vacxin</b>: {info[7]} <br>
+                  <b>Tuổi</b>: {info[6]} </br>
+                </p>
+                <a class="btn btn-primary" href="https://oa.zalo.me/2174863095751901558" role="button">
+                  <span style="color:black; font-weight: bold;">Chat với Dogily</span>
+                </a>
+                <a href="tel:0965086079" target="_self" class="btn btn-primary">
+                  <span style="color:yellow; font-weight: bold;">Hotline: 0965.086.079</span>
+                </a>
+            </div>
               """, unsafe_allow_html=True)
 col1 , col2 = st.columns(2)
 
 httpQuery = st.experimental_get_query_params()
 loai = httpQuery["loai"][0]
 giong = httpQuery["giong"][0]
+id = httpQuery["id"][0]
 
 df = Data_Shop_CatsnDogs.Data_Shop_CatsnDogs()
 
@@ -61,6 +69,14 @@ def create_database():
   list_of_Dogs = df.queryAllDatas("select distinct giong from ShopData where loai='Chó'")
   list_of_Cats = df.queryAllDatas("select distinct giong from ShopData where loai='Mèo'")
   return list_of_Cats, list_of_Dogs
+
+def get_new_image(image_path):
+  count = 0
+  for i in range(len(image_path)):
+    if image_path[i] == '/':
+      count +=1
+    if count == 3:
+      return i
 
 # cho = {loai}
 # print(cho)
@@ -73,7 +89,9 @@ with col1  :
   image_folder = os.listdir(parent_dir)[0]
   parent_dir += "/" + image_folder
   image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-  image = Image.open(image_path)
+  loai_pet = 'cat' if loai=='Mèo' else 'dog'
+  new_image = f'database/images_{loai_pet}/{id}.jpg'
+  image = Image.open(new_image)
   st.image(image, width=400)
   st.markdown("----------------------------------")
 
@@ -88,7 +106,7 @@ st.markdown("""
 <div class="container section-title-container" style="margin-bottom:0px;">
     <h2 class="section-title section-title-center">
         <b></b>
-        <span class="section-title-main" style="font-size:150%;">Sản Phẩm Liên Quan</span>
+        <span class="section-title-main" style="font-size:150%;">Các Thú Cưng Cùng Loại</span>
         <b></b>
     </h2>
 </div>
@@ -98,126 +116,171 @@ def img_to_bytes(img_path):
   encoded_img = base64.b64encode(img_bytes).decode()
   return encoded_img
 
+
 # @st.experimental_memo
 def write_animals(info, image):
-  image_byte = img_to_bytes(image)
+  index = get_new_image(image) + 1
+  id_image = image[index:-37]
+  loai = 'cat' if info[0]=='Mèo' else 'dog'
+  new_image = f'database/images_{loai}/{id_image}.jpg'
+  image_byte = img_to_bytes(new_image)
   return st.markdown(f"""
           <div class="text-center">
-            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}' target="_parent">
-                <img src='data:image/jpeg;charset=utf-8;base64,{image_byte}' style='height: 100%; width: 100%; object-fit: contain; border:1px solid black'>
+            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}&id={id_image}' target="_parent">
+                <img src='data:image/jpeg;charset=utf-8;base64,{image_byte}' style='height: 200px; width: 210px; object-fit: contain; border:1px solid black'>
               </a>
-            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}' target="_parent">
+            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={info[1]}&loai={info[0]}&id={id_image}' target="_parent">
                 <h3 style='text-align: center; color: black; font-size: 30px;'>{info[1]}</h3>
             </a>
+          </div>
+          """, unsafe_allow_html=True)
+
+def write_animals_no_name(id_image):
+  loai_eng = 'cat' if loai=='Mèo' else 'dog'
+  image_path = f'database/images_{loai_eng}/{id_image}.jpg'
+  image_byte_new = img_to_bytes(image_path)
+  return st.markdown(f"""
+          <div class="text-center">
+            <a href='http://localhost:8501/Chi_Tiết_Sản_Phẩm/?giong={giong}&loai={loai}&id={id_image}' target="_parent">
+                <img src='data:image/jpeg;charset=utf-8;base64,{image_byte_new}' style='height: 200px; width: 210px; object-fit: contain; border:1px solid black'>
+              </a>
           </div>
           """, unsafe_allow_html=True)
 
 def create_details(list_of_Cats, list_of_Dogs):
   ob_dog = []
   ob_cat = []
-  for i in range(15):
+  for i in range(len(list_of_Dogs)):
     if i <= 10:
       ob_dog.append(df.queryData(f"select * from ShopData where loai='Chó' and giong='{list_of_Dogs[i][0]}'"))
       ob_cat.append(df.queryData(f"select * from ShopData where loai='Mèo' and giong='{list_of_Cats[i][0]}'"))
+    else:
+      ob_dog.append(df.queryData(f"select * from ShopData where loai='Chó' and giong='{list_of_Dogs[i][0]}'"))
   return ob_dog, ob_cat
 
+list_theo_giong = os.listdir(f".\{loai}\{giong}")
+col1, col2, col3, col4, col5 = st.columns(5)
+if len(list_theo_giong) <= 5:
+  try:
+    with col1:
+      id_image = list_theo_giong[0]
+      write_animals_no_name(id_image)
+      st.markdown("----------------------------------")
+    with col2:
+      id_image = list_theo_giong[1]
+      write_animals_no_name(id_image)
+      st.markdown("----------------------------------")
+    with col3:
+      id_image = list_theo_giong[2]
+      write_animals_no_name(id_image)
+      st.markdown("----------------------------------")
+    with col4:
+      id_image = list_theo_giong[3]
+      write_animals_no_name(id_image)
+      st.markdown("----------------------------------")
+    with col5:
+      id_image = list_theo_giong[4]
+      write_animals_no_name(id_image)
+      st.markdown("----------------------------------")
+  except:
+    pass
+else:
+  try:
+    with col1:
+      for i in [0,6]:
+          id_image = list_theo_giong[i]
+          write_animals_no_name(id_image)
+          st.markdown("----------------------------------")
+    with col2:
+      for i in [1,7]:
+          id_image = list_theo_giong[i]
+          write_animals_no_name(id_image)
+          st.markdown("----------------------------------")
+    with col3:
+      for i in [2,8]:
+          id_image = list_theo_giong[i]
+          write_animals_no_name(id_image)
+          st.markdown("----------------------------------")
+    with col4:
+      for i in [3,9]:
+          id_image = list_theo_giong[i]
+          write_animals_no_name(id_image)
+          st.markdown("----------------------------------")
+    with col5:
+      for i in [4,10]:
+          id_image = list_theo_giong[i]
+          write_animals_no_name(id_image)
+          st.markdown("----------------------------------")
+  except:
+    pass
 print("=================")
+
+st.markdown(f"""
+<div class="container section-title-container" style="margin-bottom:0px;">
+    <h2 class="section-title section-title-center">
+        <b></b>
+        <span class="section-title-main" style="font-size:150%;">Các Giống {loai} Khác</span>
+        <b></b>
+    </h2>
+</div>
+""", unsafe_allow_html=True)
 list_of_Cats, list_of_Dogs = create_database()
 ob_dog, ob_cat = create_details(list_of_Cats, list_of_Dogs)
 
-col1, col2,col3,col4,col5 = st.columns(5)
-
-if cho == 1:
+def create_pet_image(ob, list_of_pet, loai_pet):
   temp = (giong,)
-  index = list_of_Dogs.index(temp)
-  ob_dog.pop(index)
+  index = list_of_pet.index(temp)
+  ob.pop(index)
   with col1:
     for i in range(0,2):
-        parent_dir = f"./Chó/{list(ob_dog[i])[3]}"
+        parent_dir = f"./{loai_pet}/{list(ob[i])[3]}"
         image_folder = os.listdir(parent_dir)[0]
         parent_dir += "/" + image_folder
         image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_dog[i])[2:4], image_path)
+        write_animals(list(ob[i])[2:4], image_path)
         st.markdown("----------------------------------")
-
   with col2:
     for i in range(2,4):
-        parent_dir = f"./Chó/{list(ob_dog[i])[3]}"
+        parent_dir = f"./{loai_pet}/{list(ob[i])[3]}"
         image_folder = os.listdir(parent_dir)[0]
         parent_dir += "/" + image_folder
         image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_dog[i])[2:4], image_path)
+        write_animals(list(ob[i])[2:4], image_path)
         st.markdown("----------------------------------")
   with col3:
     for i in range(4,6):
-        parent_dir = f"./Chó/{list(ob_dog[i])[3]}"
+        parent_dir = f"./{loai_pet}/{list(ob[i])[3]}"
         image_folder = os.listdir(parent_dir)[0]
         parent_dir += "/" + image_folder
         image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_dog[i])[2:4], image_path)
+        write_animals(list(ob[i])[2:4], image_path)
         st.markdown("----------------------------------")
   with col4:
     for i in range(6,8):
-        parent_dir = f"./Chó/{list(ob_dog[i])[3]}"
+        parent_dir = f"./{loai_pet}/{list(ob[i])[3]}"
         image_folder = os.listdir(parent_dir)[0]
         parent_dir += "/" + image_folder
         image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_dog[i])[2:4], image_path)
+        write_animals(list(ob[i])[2:4], image_path)
         st.markdown("----------------------------------")
   with col5:
     for i in range(8,10):
-        parent_dir = f"./Chó/{list(ob_dog[i])[3]}"
+        parent_dir = f"./{loai_pet}/{list(ob[i])[3]}"
         image_folder = os.listdir(parent_dir)[0]
         parent_dir += "/" + image_folder
         image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_dog[i])[2:4], image_path)
+        write_animals(list(ob[i])[2:4], image_path)
         st.markdown("----------------------------------")
+
+col1, col2, col3, col4, col5 = st.columns(5)
+
+if cho == 1:
+  create_pet_image(ob_dog, list_of_Dogs, 'Chó')
 else:
-  col1, col2, col3, col4, col5 = st.columns(5)
-  temp = (giong,)
-  index = list_of_Cats.index(temp)
-  ob_cat.pop(index)
-  with col1: 
-    for i in range(0,2):
-        parent_dir = f"./Mèo/{list(ob_cat)[i][3]}"
-        image_folder = os.listdir(parent_dir)[0]
-        parent_dir += "/" + image_folder
-        image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_cat)[i][2:4], image_path)
-        st.markdown("----------------------------------")
+  create_pet_image(ob_cat, list_of_Cats, 'Mèo')
 
-  with col2:
-    for i in range(2,4):
-        parent_dir = f"./Mèo/{list(ob_cat)[i][3]}"
-        image_folder = os.listdir(parent_dir)[0]
-        parent_dir += "/" + image_folder
-        image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_cat)[i][2:4], image_path)
-        st.markdown("----------------------------------")
-  with col3:
-    for i in range(4,6):
-        parent_dir = f"./Mèo/{list(ob_cat)[i][3]}"
-        image_folder = os.listdir(parent_dir)[0]
-        parent_dir += "/" + image_folder
-        image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_cat)[i][2:4], image_path)
-        st.markdown("----------------------------------")
-  with col4:
-    for i in range(6,8):
-        parent_dir = f"./Mèo/{list(ob_cat)[i][3]}"
-        image_folder = os.listdir(parent_dir)[0]
-        parent_dir += "/" + image_folder
-        image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_cat)[i][2:4], image_path)
-        st.markdown("----------------------------------")
-  with col5:
-    for i in range(8,10):
-        parent_dir = f"./Mèo/{list(ob_cat)[i][3]}"
-        image_folder = os.listdir(parent_dir)[0]
-        parent_dir += "/" + image_folder
-        image_path = parent_dir + "/" + os.listdir(parent_dir)[0]
-        write_animals(list(ob_cat)[i][2:4], image_path)
-        st.markdown("----------------------------------")
+# test = df.queryAllDatas("select * from ShopData where id='179132fbe27c4f3c8eab5a547d51a6d3'")
+# st.write(test)
 
 st.markdown("""
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
